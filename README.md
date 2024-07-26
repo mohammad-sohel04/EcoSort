@@ -38,15 +38,28 @@ Annotted dataset is divided into 3 parts
 
 
 ## Setup
-Create a virtual envirnment
+
+To install the required dependencies, follow these steps:
+
+1. Create a virtual envirnment
 ```bash
 python -m venv venv
 ```
 
-activate the virtual envirnment
+
+2. Activate the virtual environment:
 ```bash
-.\venv\Scripts\Activate.ps1 
+.\venv\Scripts\Activate.ps1
 ```
+
+3. Install the dependencies using pip:
+```bash
+pip install -r requirements.txt
+```
+
+This will install all the necessary libraries and packages specified in the `requirements.txt` file.
+
+Once the installation is complete, you can proceed with using EcoSort as described in the Usage section.
 
 ## Usage
 
