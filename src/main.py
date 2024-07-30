@@ -3,40 +3,15 @@ import time
 import picamera
 import RPi.GPIO as GPIO
 
-# Function to capture an image
-def capture_image(capture_images, filename):
-    # Ensure the directory exists
-    if not os.path.exists(capture_images):
-        os.makedirs(capture_images)
-
-    # Initialize the PiCamera
-    with picamera.PiCamera() as camera:
-        # Adjust camera settings if needed
-        camera.resolution = (1920, 1080)  # Set resolution
-        # camera.rotation = 180             # Set rotation
-
-        # Capture an image
-        camera.start_preview()
-        # Add a delay to allow the camera to adjust to light levels
-        time.sleep(2)
-        camera.capture(os.path.join(capture_images, filename))
-        camera.stop_preview()
-
-# Function to read content from a text file
-def read_text_file(directory, filename):
-    file_path = os.path.join(directory, filename)
-    try:
-        with open(file_path, 'r') as file:
-            content = file.read()
-            return content
-    except FileNotFoundError:
-        print(f"The file {filename} does not exist in the directory {directory}.")
-        return None
+import captureimage
+import read_text_file
+import log_to_csv
+import get_next_filename
 
 # Main function
 def main():
-    capture_imagesectory = "/home/pi/Desktop/GarbageDetection/PhotoOutput"  # Directory to save captured images
-    filename = "image.jpg"  # Name of the captured image file
+    save_directory = "/home/pi/Desktop/GarbageDetection/PhotoOutput"  # Directory to save captured images
+    csv_file = os.path.join(save_directory, "image_tags.csv")  # Path to the CSV file
 
     # Set up the IR sensor pin
     ir_sensor_pin = 7  # Define the GPIO pin connected to the IR sensor
@@ -49,8 +24,9 @@ def main():
         while True:
             if GPIO.input(ir_sensor_pin) == GPIO.LOW:  # Detect object presence
                 print("Object detected! Capturing image...")
-                capture_image(capture_imagesectory, filename)  # Capture image when object is detected
-                print(f"Image captured and saved to {os.path.join(capture_imagesectory, filename)}")
+                filename = get_next_filename(save_directory, "capture", "jpeg")  # Generate next filename
+                capture_image(save_directory, filename)  # Capture image when object is detected
+                print(f"Image captured and saved to {os.path.join(save_directory, filename)}")
                 break
             time.sleep(0.1)  # Small delay to prevent CPU overload
     except KeyboardInterrupt:
@@ -63,6 +39,9 @@ def main():
 
     if file_content is not None:
         print(file_content)  # Print the content of the text file
+
+        # Log the image filename and its associated tag to the CSV file
+        log_to_csv(csv_file, filename, file_content)
 
         # Define GPIO pins for different materials based on the file content
         if file_content == "BIODEGRADABLE":
@@ -101,5 +80,3 @@ def main():
 
 if __name__ == "__main__":
     main()  # Run the main function
-
-
