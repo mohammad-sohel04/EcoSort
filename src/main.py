@@ -3,7 +3,7 @@ import time
 import picamera
 import RPi.GPIO as GPIO
 
-import captureimage
+import capture_image
 import read_text_file
 import log_to_csv
 import get_next_filename
@@ -13,24 +13,11 @@ def main():
     save_directory = "/home/pi/Desktop/GarbageDetection/PhotoOutput"  # Directory to save captured images
     csv_file = os.path.join(save_directory, "image_tags.csv")  # Path to the CSV file
 
-    # Set up the IR sensor pin
-    ir_sensor_pin = 7  # Define the GPIO pin connected to the IR sensor
-    GPIO.setmode(GPIO.BOARD)  # Set GPIO mode to BOARD
-    GPIO.setup(ir_sensor_pin, GPIO.IN)  # Set IR sensor pin as input
-
-    # Wait for object detection via IR sensor
-    print("Waiting for object detection...")
-    try:
-        while True:
-            if GPIO.input(ir_sensor_pin) == GPIO.LOW:  # Detect object presence
-                print("Object detected! Capturing image...")
-                filename = get_next_filename(save_directory, "capture", "jpeg")  # Generate next filename
-                capture_image(save_directory, filename)  # Capture image when object is detected
-                print(f"Image captured and saved to {os.path.join(save_directory, filename)}")
-                break
-            time.sleep(0.1)  # Small delay to prevent CPU overload
-    except KeyboardInterrupt:
-        print("Interrupted by user")
+    # Capture an image
+    filename = get_next_filename(save_directory, "capture", "jpeg")  # Generate next filename
+    print("Capturing image...")
+    capture_image(save_directory, filename)  # Capture image
+    print(f"Image captured and saved to {os.path.join(save_directory, filename)}")
 
     # Read the content from the prediction output text file
     directory = '/home/pi/Desktop/GarbageDetection/TextInput'  # Directory containing the prediction output text file
